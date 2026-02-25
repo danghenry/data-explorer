@@ -1,8 +1,20 @@
 // Dynamically load the CSS for the explorer
-const link = document.createElement("link");
-link.rel = "stylesheet";
-link.href = "https://danghenry.github.io/data-explorer/explorer-style.css";
-document.head.appendChild(link);
+function loadExplorerCSS(href, callback) {
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = href;
+  link.onload = callback; // wait until CSS loads before continuing
+  document.head.appendChild(link);
+}
+
+// Initialize
+document.addEventListener("DOMContentLoaded", () => {
+  const explorer = new FunWithDataExplorer(
+    "fwd-data-explorer",
+    "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
+  );
+  explorer.init();
+});
 
 class FunWithDataExplorer {
   constructor(containerId, dataUrl) {
@@ -237,14 +249,7 @@ class FunWithDataExplorer {
   }
 }
 
-// Initialize
-document.addEventListener("DOMContentLoaded", () => {
-  const explorer = new FunWithDataExplorer(
-    "fwd-data-explorer",
-    "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
-  );
-  explorer.init();
-});
+
 
 
 
