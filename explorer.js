@@ -7,14 +7,21 @@ function loadExplorerCSS(href, callback) {
   document.head.appendChild(link);
 }
 
-// Initialize
+// Initialize everything after DOM is ready and CSS is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  const explorer = new FunWithDataExplorer(
-    "fwd-data-explorer",
-    "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
+  loadExplorerCSS(
+    "https://danghenry.github.io/data-explorer/explorer-style.css",
+    () => {
+      // Create and initialize explorer after CSS loads
+      const explorer = new FunWithDataExplorer(
+        "fwd-data-explorer",
+        "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
+      );
+      explorer.init();
+    }
   );
-  explorer.init();
 });
+
 
 class FunWithDataExplorer {
   constructor(containerId, dataUrl) {
@@ -248,6 +255,7 @@ class FunWithDataExplorer {
     link.click();
   }
 }
+
 
 
 
