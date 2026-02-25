@@ -237,5 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
   );
   explorer.init();
-});
+
+
 
