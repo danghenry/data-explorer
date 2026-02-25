@@ -1,0 +1,45 @@
+#fwd-data-explorer {
+  max-width: 1100px;
+  margin: 40px auto;
+  font-family: inherit;
+}
+
+.fwd-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.fwd-controls select,
+.fwd-controls button {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.fwd-tabs {
+  margin: 20px 0;
+}
+
+.fwd-tabs button {
+  margin-right: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+#fwd-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#fwd-table th,
+#fwd-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#fwd-table th {
+  background-color: #f4f4f4;
+}
