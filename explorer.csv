@@ -1,0 +1,52 @@
+topic,indicator,geography,year,value,unit
+Labour,Unemployment Rate,Canada,2019,5.7,%
+Labour,Unemployment Rate,Canada,2020,9.5,%
+Labour,Unemployment Rate,Canada,2021,7.5,%
+Labour,Unemployment Rate,Canada,2022,5.3,%
+Labour,Unemployment Rate,Ontario,2019,5.6,%
+Labour,Unemployment Rate,Ontario,2020,9.6,%
+Labour,Unemployment Rate,Ontario,2021,8.0,%
+Labour,Unemployment Rate,Ontario,2022,5.6,%
+Labour,Unemployment Rate,Alberta,2019,6.9,%
+Labour,Unemployment Rate,Alberta,2020,11.4,%
+Labour,Unemployment Rate,Alberta,2021,8.7,%
+Labour,Unemployment Rate,Alberta,2022,6.1,%
+
+Economy,GDP (Billions),Canada,2019,2000,CAD Billions
+Economy,GDP (Billions),Canada,2020,1900,CAD Billions
+Economy,GDP (Billions),Canada,2021,2100,CAD Billions
+Economy,GDP (Billions),Canada,2022,2200,CAD Billions
+Economy,GDP (Billions),Ontario,2019,800,CAD Billions
+Economy,GDP (Billions),Ontario,2020,760,CAD Billions
+Economy,GDP (Billions),Ontario,2021,850,CAD Billions
+Economy,GDP (Billions),Ontario,2022,900,CAD Billions
+Economy,GDP (Billions),Alberta,2019,350,CAD Billions
+Economy,GDP (Billions),Alberta,2020,330,CAD Billions
+Economy,GDP (Billions),Alberta,2021,370,CAD Billions
+Economy,GDP (Billions),Alberta,2022,390,CAD Billions
+
+Housing,Average Rent,Canada,2019,1200,CAD
+Housing,Average Rent,Canada,2020,1250,CAD
+Housing,Average Rent,Canada,2021,1350,CAD
+Housing,Average Rent,Canada,2022,1500,CAD
+Housing,Average Rent,Ontario,2019,1300,CAD
+Housing,Average Rent,Ontario,2020,1350,CAD
+Housing,Average Rent,Ontario,2021,1450,CAD
+Housing,Average Rent,Ontario,2022,1600,CAD
+Housing,Average Rent,Alberta,2019,1100,CAD
+Housing,Average Rent,Alberta,2020,1150,CAD
+Housing,Average Rent,Alberta,2021,1200,CAD
+Housing,Average Rent,Alberta,2022,1300,CAD
+
+Environment,CO2 Emissions (Mt),Canada,2019,730,Mt
+Environment,CO2 Emissions (Mt),Canada,2020,690,Mt
+Environment,CO2 Emissions (Mt),Canada,2021,710,Mt
+Environment,CO2 Emissions (Mt),Canada,2022,720,Mt
+Environment,CO2 Emissions (Mt),Ontario,2019,150,Mt
+Environment,CO2 Emissions (Mt),Ontario,2020,140,Mt
+Environment,CO2 Emissions (Mt),Ontario,2021,145,Mt
+Environment,CO2 Emissions (Mt),Ontario,2022,148,Mt
+Environment,CO2 Emissions (Mt),Alberta,2019,260,Mt
+Environment,CO2 Emissions (Mt),Alberta,2020,250,Mt
+Environment,CO2 Emissions (Mt),Alberta,2021,255,Mt
+Environment,CO2 Emissions (Mt),Alberta,2022,258,Mt
