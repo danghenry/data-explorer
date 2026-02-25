@@ -4,20 +4,15 @@ class FunWithDataExplorer {
     this.dataUrl = dataUrl;
     this.data = [];
     this.chart = null;
-    this.hasSubtopic = false; // Will detect if CSV contains subtopic
+    this.hasSubtopic = false; // auto-detect
   }
 
   async init() {
-    await this.loadData(
-      complete: (results) => {
-  console.log("CSV loaded:", results.data);
-  this.data = results.data.filter(row => row.topic && row.indicator_id);
-  console.log("Filtered data:", this.data);
-  resolve();
-},
-    );
-    // Detect if subtopic column exists
-    this.hasSubtopic = this.data.length > 0 && "subtopic" in this.data[0];
+    await this.loadData();
+
+    // Detect if CSV contains 'subtopic' column
+    this.hasSubtopic = this.data.length > 0 && Object.keys(this.data[0]).includes("subtopic");
+
     this.renderLayout();
     this.populateControls();
     this.update();
@@ -29,29 +24,31 @@ class FunWithDataExplorer {
         download: true,
         header: true,
         dynamicTyping: true,
+        skipEmptyLines: true,
         complete: (results) => {
-          // Remove empty rows
+          // Keep only rows with mandatory columns
           this.data = results.data.filter(row => row.topic && row.indicator_id);
+          console.log("CSV loaded. Rows:", this.data.length);
           resolve();
         },
-        error: (error) => {
-          console.error("CSV Load Error:", error);
-          reject(error);
+        error: (err) => {
+          console.error("CSV Load Error:", err);
+          reject(err);
         }
       });
     });
   }
 
   renderLayout() {
-    let subtopicDropdown = "";
+    let subtopicHTML = "";
     if (this.hasSubtopic) {
-      subtopicDropdown = `<select id="subtopic-select"></select>`;
+      subtopicHTML = `<select id="subtopic-select"></select>`;
     }
 
     this.container.innerHTML = `
       <div class="fwd-controls">
         <select id="topic-select"></select>
-        ${subtopicDropdown}
+        ${subtopicHTML}
         <select id="indicator-select"></select>
         <select id="geo-select"></select>
         <select id="year-select"></select>
@@ -72,23 +69,23 @@ class FunWithDataExplorer {
   }
 
   populateControls() {
-    // Populate topics
+    // Populate Topics
     const topics = [...new Set(this.data.map(d => d.topic))];
     this.populateDropdown("topic-select", topics);
 
-    // Populate geographies
+    // Populate Geographies
     const geos = [...new Set(this.data.map(d => d.geography))];
     this.populateDropdown("geo-select", geos);
 
-    // Populate years
+    // Populate Years
     const years = ["All", ...new Set(this.data.map(d => d.year))];
     this.populateDropdown("year-select", years);
 
-    // Populate frequencies
+    // Populate Frequencies
     const frequencies = [...new Set(this.data.map(d => d.frequency))];
     this.populateDropdown("frequency-select", frequencies);
 
-    // Event listeners
+    // Event Listeners
     document.getElementById("topic-select").addEventListener("change", () => {
       if (this.hasSubtopic) this.updateSubtopics();
       this.updateIndicators();
@@ -120,9 +117,8 @@ class FunWithDataExplorer {
 
   updateSubtopics() {
     if (!this.hasSubtopic) return;
-
     const topic = document.getElementById("topic-select").value;
-    const subtopics = [...new Set(this.data.filter(d => d.topic === topic).map(d => d.subtopic))];
+    const subtopics = [...new Set(this.data.filter(d => d.topic === topic && d.subtopic).map(d => d.subtopic))];
     this.populateDropdown("subtopic-select", subtopics);
   }
 
@@ -131,12 +127,9 @@ class FunWithDataExplorer {
     const subtopic = this.hasSubtopic ? document.getElementById("subtopic-select").value : null;
 
     let filtered = this.data.filter(d => d.topic === topic);
-    if (this.hasSubtopic && subtopic) {
-      filtered = filtered.filter(d => d.subtopic === subtopic);
-    }
+    if (this.hasSubtopic && subtopic) filtered = filtered.filter(d => d.subtopic === subtopic);
 
     const indicators = [...new Set(filtered.map(d => `${d.indicator_id}||${d.indicator}`))];
-
     const select = document.getElementById("indicator-select");
     select.innerHTML = indicators.map(v => {
       const [id, name] = v.split("||");
@@ -169,7 +162,6 @@ class FunWithDataExplorer {
     this.renderMetadata(filtered[0]);
   }
 
-  // Chart, Table, Metadata functions remain the same as previous code
   renderChart(data) {
     const ctx = document.getElementById("fwd-chart");
     if (this.chart) this.chart.destroy();
@@ -247,4 +239,3 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   explorer.init();
 });
-
