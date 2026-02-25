@@ -230,21 +230,11 @@ class FunWithDataExplorer {
   }
 }
 
-// explorer.js
-
-// ... FunWithDataExplorer class code here ...
-
-// Initialize the explorer
+// Initialize
 document.addEventListener("DOMContentLoaded", () => {
   const explorer = new FunWithDataExplorer(
     "fwd-data-explorer",
-    "https://danghenry.github.io/data-explorer/new-test.csv"
+    "https://danghenry.github.io/data-explorer/explorer.csv"
   );
   explorer.init();
 });
-
-
-
-
-
-
