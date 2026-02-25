@@ -232,9 +232,16 @@ class FunWithDataExplorer {
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+
+  const googleSheetId = "1FO5cihbBfCeXxrEeSKiYJvNMAuPXsUkDdDqCAiYLXNw";
+  const sheetGid = "0"; // Change if your tab has a different gid
+
+  const googleCsvUrl = `https://docs.google.com/spreadsheets/d/1FO5cihbBfCeXxrEeSKiYJvNMAuPXsUkDdDqCAiYLXNw/export?format=csv&gid=0`;
+
   const explorer = new FunWithDataExplorer(
     "fwd-data-explorer",
-    "https://danghenry.github.io/data-explorer/explorer.csv"
+    googleCsvUrl
   );
+
   explorer.init();
 });
