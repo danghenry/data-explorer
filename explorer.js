@@ -234,7 +234,8 @@ class FunWithDataExplorer {
 document.addEventListener("DOMContentLoaded", () => {
   const explorer = new FunWithDataExplorer(
     "fwd-data-explorer",
-    "https://danghenry.github.io/data-explorer/explorer.csv"
+    "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
   );
   explorer.init();
 });
+
