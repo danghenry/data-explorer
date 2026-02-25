@@ -18,26 +18,43 @@ class FunWithDataExplorer {
     this.update();
   }
 
-  async loadData() {
-    return new Promise((resolve, reject) => {
-      Papa.parse(this.dataUrl, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          this.data = results.data.filter(row => row.topic && row.indicator_id);
-          console.log("CSV loaded. Rows:", this.data.length);
-          resolve();
-        },
-        error: (err) => {
-          console.error("CSV Load Error:", err);
-          reject(err);
-        }
-      });
-    });
-  }
+ async loadData() {
+  return new Promise((resolve, reject) => {
+    Papa.parse(this.dataUrl, {
+      download: true,
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+      complete: (results) => {
 
+        // Normalize headers (lowercase + underscores)
+        this.data = results.data.map(row => {
+          const normalizedRow = {};
+          Object.keys(row).forEach(key => {
+            const normalizedKey = key
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "_");
+            normalizedRow[normalizedKey] = row[key];
+          });
+          return normalizedRow;
+        });
+
+        // Filter valid rows safely
+        this.data = this.data.filter(row => row.topic && row.indicator_id);
+
+        console.log("CSV loaded. Rows:", this.data.length);
+        console.log("Sample row:", this.data[0]);
+
+        resolve();
+      },
+      error: (err) => {
+        console.error("CSV Load Error:", err);
+        reject(err);
+      }
+    });
+  });
+}
   renderLayout() {
     let subtopicHTML = "";
     if (this.hasSubtopic) {
@@ -242,3 +259,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   explorer.init();
 });
+
