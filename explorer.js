@@ -1,28 +1,3 @@
-// Dynamically load the CSS for the explorer
-function loadExplorerCSS(href, callback) {
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = href;
-  link.onload = callback; // wait until CSS loads before continuing
-  document.head.appendChild(link);
-}
-
-// Initialize everything after DOM is ready and CSS is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadExplorerCSS(
-    "https://danghenry.github.io/data-explorer/explorer-style.css",
-    () => {
-      // Create and initialize explorer after CSS loads
-      const explorer = new FunWithDataExplorer(
-        "fwd-data-explorer",
-        "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
-      );
-      explorer.init();
-    }
-  );
-});
-
-
 class FunWithDataExplorer {
   constructor(containerId, dataUrl) {
     this.container = document.getElementById(containerId);
@@ -51,7 +26,6 @@ class FunWithDataExplorer {
         dynamicTyping: true,
         skipEmptyLines: true,
         complete: (results) => {
-          // Keep only rows with mandatory columns
           this.data = results.data.filter(row => row.topic && row.indicator_id);
           console.log("CSV loaded. Rows:", this.data.length);
           resolve();
@@ -256,16 +230,11 @@ class FunWithDataExplorer {
   }
 }
 
-
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   const explorer = new FunWithDataExplorer(
     "fwd-data-explorer",
-    "https://raw.githubusercontent.com/danghenry/data-explorer/refs/heads/main/explorer.csv"
+    "https://danghenry.github.io/data-explorer/explorer.csv"
   );
   explorer.init();
 });
-
-
-
-
