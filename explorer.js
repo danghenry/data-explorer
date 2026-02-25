@@ -8,7 +8,14 @@ class FunWithDataExplorer {
   }
 
   async init() {
-    await this.loadData();
+    await this.loadData(
+      complete: (results) => {
+  console.log("CSV loaded:", results.data);
+  this.data = results.data.filter(row => row.topic && row.indicator_id);
+  console.log("Filtered data:", this.data);
+  resolve();
+},
+    );
     // Detect if subtopic column exists
     this.hasSubtopic = this.data.length > 0 && "subtopic" in this.data[0];
     this.renderLayout();
@@ -240,3 +247,4 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   explorer.init();
 });
+
