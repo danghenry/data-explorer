@@ -1,0 +1,6 @@
+topic,subtopic,indicator_id,indicator,geography,geo_level,year,period,frequency,value,unit,definition,calculation_method,source_name,source_url,dataset_name,dataset_url,update_frequency,last_updated,notes
+Labour,Employment,LBR_UNEMP,Unemployment Rate,Canada,Country,2022,2022,Annual,5.7,%,Percentage of labour force unemployed,Unemployed / Labour Force,StatsCan,https://www.statcan.gc.ca,LFS,LFS_URL,Annual,2023-01-01,
+Labour,Employment,LBR_PART,Part-time Employment,Canada,Country,2022,2022,Annual,28.3,%,Percentage of workforce working part-time,Part-time / Total Employment,StatsCan,https://www.statcan.gc.ca,LFS,LFS_URL,Annual,2023-01-01,
+Economy,GDP,ECO_GDP,GDP,Canada,Country,2022,2022,Annual,2000,CAD Billions,Total value of goods and services produced,Expenditure-based GDP,StatsCan,https://www.statcan.gc.ca,NA,NA_URL,Annual,2023-01-01,
+Economy,Output,ECO_CPI,CPI,Canada,Country,2022,2022,Annual,132.5,Index,Consumer Price Index,Weighted basket of goods,StatsCan,https://www.statcan.gc.ca,NA,NA_URL,Annual,2023-01-01,
+Health,Life Expectancy,HLTH_LE,Life Expectancy,Canada,Country,2022,2022,Annual,82.3,Years,Average life expectancy at birth,Life table method,StatsCan,https://www.statcan.gc.ca,HLTH,HLTH_URL,Annual,2023-01-01,
