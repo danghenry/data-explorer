@@ -1,7 +1,7 @@
 // Dynamically load the CSS for the explorer
 const link = document.createElement("link");
 link.rel = "stylesheet";
-link.href = "https://YOURUSERNAME.github.io/fwd-data-explorer/explorer.css";
+link.href = "https://danghenry.github.io/data-explorer/explorer-style.css";
 document.head.appendChild(link);
 
 class FunWithDataExplorer {
@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   explorer.init();
 });
+
 
 
 
