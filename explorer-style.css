@@ -1,0 +1,129 @@
+/* ===== Import Poppins font ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+#fwd-data-explorer {
+    font-family: 'Poppins', sans-serif;
+    padding: 10px;
+}
+
+/* ===== Controls ===== */
+.fwd-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.fwd-controls select,
+.fwd-controls button {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    flex: 1 1 150px; /* responsive width */
+    min-width: 120px;
+}
+
+/* ===== Download CSV button ===== */
+#download-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+#download-btn:hover {
+    background-color: #218838;
+}
+
+/* ===== Tabs ===== */
+.fwd-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.fwd-tabs button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    flex: 1 1 100px; /* responsive width */
+    min-width: 90px;
+    transition: background-color 0.2s;
+}
+
+.fwd-tabs button:hover {
+    background-color: #218838;
+}
+
+/* ===== Containers ===== */
+#fwd-chart,
+#fwd-table-container,
+#fwd-metadata-container {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+/* ===== Table styling ===== */
+#fwd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+}
+
+#fwd-table th,
+#fwd-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+#fwd-table th {
+    background-color: #f5f5f5;
+}
+
+/* ===== Metadata container ===== */
+#fwd-metadata-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+/* ===== Mobile responsiveness ===== */
+@media (max-width: 768px) {
+    .fwd-controls,
+    .fwd-tabs {
+        flex-direction: column;
+    }
+
+    .fwd-controls select,
+    .fwd-controls button,
+    .fwd-tabs button {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    #fwd-chart,
+    #fwd-table-container,
+    #fwd-metadata-container {
+        max-width: 100%;
+    }
+
+    #fwd-table th,
+    #fwd-table td {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+}
