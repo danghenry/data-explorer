@@ -1,0 +1,15 @@
+[
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Canada","year":2019,"value":5.7,"unit":"%"},
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Canada","year":2020,"value":9.5,"unit":"%"},
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Canada","year":2021,"value":7.5,"unit":"%"},
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Ontario","year":2019,"value":5.6,"unit":"%"},
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Ontario","year":2020,"value":9.6,"unit":"%"},
+  {"topic":"Labour","indicator":"Unemployment Rate","geography":"Ontario","year":2021,"value":8.0,"unit":"%"},
+
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Canada","year":2019,"value":2000,"unit":"CAD Billions"},
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Canada","year":2020,"value":1900,"unit":"CAD Billions"},
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Canada","year":2021,"value":2100,"unit":"CAD Billions"},
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Ontario","year":2019,"value":800,"unit":"CAD Billions"},
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Ontario","year":2020,"value":760,"unit":"CAD Billions"},
+  {"topic":"Economy","indicator":"GDP (Billions)","geography":"Ontario","year":2021,"value":850,"unit":"CAD Billions"}
+]
