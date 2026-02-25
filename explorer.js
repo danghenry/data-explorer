@@ -4,16 +4,18 @@ class FunWithDataExplorer {
     this.dataUrl = dataUrl;
     this.data = [];
     this.chart = null;
+    this.hasSubtopic = false; // Will detect if CSV contains subtopic
   }
 
   async init() {
     await this.loadData();
+    // Detect if subtopic column exists
+    this.hasSubtopic = this.data.length > 0 && "subtopic" in this.data[0];
     this.renderLayout();
     this.populateControls();
     this.update();
   }
 
-  // Load CSV using PapaParse
   async loadData() {
     return new Promise((resolve, reject) => {
       Papa.parse(this.dataUrl, {
@@ -34,10 +36,15 @@ class FunWithDataExplorer {
   }
 
   renderLayout() {
+    let subtopicDropdown = "";
+    if (this.hasSubtopic) {
+      subtopicDropdown = `<select id="subtopic-select"></select>`;
+    }
+
     this.container.innerHTML = `
       <div class="fwd-controls">
         <select id="topic-select"></select>
-        <select id="subtopic-select"></select>
+        ${subtopicDropdown}
         <select id="indicator-select"></select>
         <select id="geo-select"></select>
         <select id="year-select"></select>
@@ -76,11 +83,15 @@ class FunWithDataExplorer {
 
     // Event listeners
     document.getElementById("topic-select").addEventListener("change", () => {
-      this.updateSubtopics();
+      if (this.hasSubtopic) this.updateSubtopics();
       this.updateIndicators();
       this.update();
     });
-    document.getElementById("subtopic-select").addEventListener("change", () => this.updateIndicators());
+
+    if (this.hasSubtopic) {
+      document.getElementById("subtopic-select").addEventListener("change", () => this.updateIndicators());
+    }
+
     document.getElementById("indicator-select").addEventListener("change", () => this.update());
     document.getElementById("geo-select").addEventListener("change", () => this.update());
     document.getElementById("year-select").addEventListener("change", () => this.update());
@@ -91,7 +102,7 @@ class FunWithDataExplorer {
     document.getElementById("metadata-tab").addEventListener("click", () => this.showMetadata());
     document.getElementById("download-btn").addEventListener("click", () => this.downloadCSV());
 
-    this.updateSubtopics();
+    if (this.hasSubtopic) this.updateSubtopics();
     this.updateIndicators();
   }
 
@@ -101,6 +112,8 @@ class FunWithDataExplorer {
   }
 
   updateSubtopics() {
+    if (!this.hasSubtopic) return;
+
     const topic = document.getElementById("topic-select").value;
     const subtopics = [...new Set(this.data.filter(d => d.topic === topic).map(d => d.subtopic))];
     this.populateDropdown("subtopic-select", subtopics);
@@ -108,13 +121,15 @@ class FunWithDataExplorer {
 
   updateIndicators() {
     const topic = document.getElementById("topic-select").value;
-    const subtopic = document.getElementById("subtopic-select").value;
-    const indicators = [...new Set(
-      this.data.filter(d => d.topic === topic && d.subtopic === subtopic)
-               .map(d => `${d.indicator_id}||${d.indicator}`)
-    )];
+    const subtopic = this.hasSubtopic ? document.getElementById("subtopic-select").value : null;
 
-    // Store both id and name in value
+    let filtered = this.data.filter(d => d.topic === topic);
+    if (this.hasSubtopic && subtopic) {
+      filtered = filtered.filter(d => d.subtopic === subtopic);
+    }
+
+    const indicators = [...new Set(filtered.map(d => `${d.indicator_id}||${d.indicator}`))];
+
     const select = document.getElementById("indicator-select");
     select.innerHTML = indicators.map(v => {
       const [id, name] = v.split("||");
@@ -124,7 +139,7 @@ class FunWithDataExplorer {
 
   filterData() {
     const topic = document.getElementById("topic-select").value;
-    const subtopic = document.getElementById("subtopic-select").value;
+    const subtopic = this.hasSubtopic ? document.getElementById("subtopic-select").value : null;
     const indicator_id = document.getElementById("indicator-select").value;
     const geo = document.getElementById("geo-select").value;
     const year = document.getElementById("year-select").value;
@@ -132,7 +147,7 @@ class FunWithDataExplorer {
 
     return this.data.filter(d =>
       d.topic === topic &&
-      d.subtopic === subtopic &&
+      (!this.hasSubtopic || d.subtopic === subtopic) &&
       d.indicator_id === indicator_id &&
       d.geography === geo &&
       (year === "All" || d.year == year) &&
@@ -147,6 +162,7 @@ class FunWithDataExplorer {
     this.renderMetadata(filtered[0]);
   }
 
+  // Chart, Table, Metadata functions remain the same as previous code
   renderChart(data) {
     const ctx = document.getElementById("fwd-chart");
     if (this.chart) this.chart.destroy();
@@ -163,10 +179,7 @@ class FunWithDataExplorer {
           tension: 0.1
         }]
       },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: true } }
-      }
+      options: { responsive: true, plugins: { legend: { display: true } } }
     });
   }
 
@@ -176,19 +189,11 @@ class FunWithDataExplorer {
       <table id="fwd-table">
         <thead>
           <tr>
-            <th>Period/Year</th>
-            <th>Value</th>
-            <th>Unit</th>
+            <th>Period/Year</th><th>Value</th><th>Unit</th>
           </tr>
         </thead>
         <tbody>
-          ${data.map(d => `
-            <tr>
-              <td>${d.period || d.year}</td>
-              <td>${d.value}</td>
-              <td>${d.unit}</td>
-            </tr>
-          `).join("")}
+          ${data.map(d => `<tr><td>${d.period || d.year}</td><td>${d.value}</td><td>${d.unit}</td></tr>`).join("")}
         </tbody>
       </table>
     `;
@@ -196,49 +201,29 @@ class FunWithDataExplorer {
 
   renderMetadata(d) {
     const container = document.getElementById("fwd-metadata-container");
-    if (!d) {
-      container.innerHTML = "<p>No metadata available</p>";
-      return;
-    }
+    if (!d) { container.innerHTML = "<p>No metadata available</p>"; return; }
 
     container.innerHTML = `
       <h3>${d.indicator}</h3>
-      <p><strong>Definition:</strong> ${d.definition}</p>
-      <p><strong>Calculation Method:</strong> ${d.calculation_method}</p>
-      <p><strong>Source:</strong> <a href="${d.source_url}" target="_blank">${d.source_name}</a></p>
-      <p><strong>Dataset:</strong> <a href="${d.dataset_url}" target="_blank">${d.dataset_name}</a></p>
-      <p><strong>Frequency:</strong> ${d.frequency}</p>
-      <p><strong>Last Updated:</strong> ${d.last_updated}</p>
-      <p><strong>Notes:</strong> ${d.notes}</p>
+      <p><strong>Definition:</strong> ${d.definition || "N/A"}</p>
+      <p><strong>Calculation Method:</strong> ${d.calculation_method || "N/A"}</p>
+      <p><strong>Source:</strong> <a href="${d.source_url}" target="_blank">${d.source_name || "N/A"}</a></p>
+      <p><strong>Dataset:</strong> <a href="${d.dataset_url}" target="_blank">${d.dataset_name || "N/A"}</a></p>
+      <p><strong>Frequency:</strong> ${d.frequency || "N/A"}</p>
+      <p><strong>Last Updated:</strong> ${d.last_updated || "N/A"}</p>
+      <p><strong>Notes:</strong> ${d.notes || ""}</p>
     `;
   }
 
-  showChart() {
-    document.getElementById("fwd-chart").style.display = "block";
-    document.getElementById("fwd-table-container").style.display = "none";
-    document.getElementById("fwd-metadata-container").style.display = "none";
-  }
-
-  showTable() {
-    document.getElementById("fwd-chart").style.display = "none";
-    document.getElementById("fwd-table-container").style.display = "block";
-    document.getElementById("fwd-metadata-container").style.display = "none";
-  }
-
-  showMetadata() {
-    document.getElementById("fwd-chart").style.display = "none";
-    document.getElementById("fwd-table-container").style.display = "none";
-    document.getElementById("fwd-metadata-container").style.display = "block";
-  }
+  showChart() { document.getElementById("fwd-chart").style.display="block"; document.getElementById("fwd-table-container").style.display="none"; document.getElementById("fwd-metadata-container").style.display="none"; }
+  showTable() { document.getElementById("fwd-chart").style.display="none"; document.getElementById("fwd-table-container").style.display="block"; document.getElementById("fwd-metadata-container").style.display="none"; }
+  showMetadata() { document.getElementById("fwd-chart").style.display="none"; document.getElementById("fwd-table-container").style.display="none"; document.getElementById("fwd-metadata-container").style.display="block"; }
 
   downloadCSV() {
     const data = this.filterData();
-    const headers = Object.keys(data[0] || {});
-    const csv = [
-      headers.join(","),
-      ...data.map(row => headers.map(h => row[h]).join(","))
-    ].join("\n");
-
+    if (data.length === 0) return alert("No data to download");
+    const headers = Object.keys(data[0]);
+    const csv = [headers.join(","), ...data.map(row => headers.map(h => row[h]).join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -255,4 +240,3 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   explorer.init();
 });
-
