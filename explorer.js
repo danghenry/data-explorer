@@ -13,49 +13,85 @@ class FunWithDataExplorer {
     this.update();
   }
 
+  // Load CSV using PapaParse
   async loadData() {
-    const res = await fetch(this.dataUrl);
-    this.data = await res.json();
+    return new Promise((resolve, reject) => {
+      Papa.parse(this.dataUrl, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          // Remove empty rows
+          this.data = results.data.filter(row => row.topic && row.indicator_id);
+          resolve();
+        },
+        error: (error) => {
+          console.error("CSV Load Error:", error);
+          reject(error);
+        }
+      });
+    });
   }
 
   renderLayout() {
     this.container.innerHTML = `
       <div class="fwd-controls">
         <select id="topic-select"></select>
+        <select id="subtopic-select"></select>
         <select id="indicator-select"></select>
         <select id="geo-select"></select>
         <select id="year-select"></select>
+        <select id="frequency-select"></select>
         <button id="download-btn">Download CSV</button>
       </div>
 
       <div class="fwd-tabs">
         <button id="chart-tab">Chart</button>
         <button id="table-tab">Table</button>
+        <button id="metadata-tab">Metadata</button>
       </div>
 
       <canvas id="fwd-chart"></canvas>
       <div id="fwd-table-container" style="display:none;"></div>
+      <div id="fwd-metadata-container" style="display:none; border:1px solid #ddd; padding:10px; margin-top:20px;"></div>
     `;
   }
 
   populateControls() {
-    this.populateDropdown("topic-select", [...new Set(this.data.map(d => d.topic))]);
-    this.populateDropdown("geo-select", [...new Set(this.data.map(d => d.geography))]);
-    this.populateDropdown("year-select", ["All", ...new Set(this.data.map(d => d.year))]);
+    // Populate topics
+    const topics = [...new Set(this.data.map(d => d.topic))];
+    this.populateDropdown("topic-select", topics);
 
+    // Populate geographies
+    const geos = [...new Set(this.data.map(d => d.geography))];
+    this.populateDropdown("geo-select", geos);
+
+    // Populate years
+    const years = ["All", ...new Set(this.data.map(d => d.year))];
+    this.populateDropdown("year-select", years);
+
+    // Populate frequencies
+    const frequencies = [...new Set(this.data.map(d => d.frequency))];
+    this.populateDropdown("frequency-select", frequencies);
+
+    // Event listeners
     document.getElementById("topic-select").addEventListener("change", () => {
+      this.updateSubtopics();
       this.updateIndicators();
       this.update();
     });
-
+    document.getElementById("subtopic-select").addEventListener("change", () => this.updateIndicators());
     document.getElementById("indicator-select").addEventListener("change", () => this.update());
     document.getElementById("geo-select").addEventListener("change", () => this.update());
     document.getElementById("year-select").addEventListener("change", () => this.update());
+    document.getElementById("frequency-select").addEventListener("change", () => this.update());
 
     document.getElementById("chart-tab").addEventListener("click", () => this.showChart());
     document.getElementById("table-tab").addEventListener("click", () => this.showTable());
+    document.getElementById("metadata-tab").addEventListener("click", () => this.showMetadata());
     document.getElementById("download-btn").addEventListener("click", () => this.downloadCSV());
 
+    this.updateSubtopics();
     this.updateIndicators();
   }
 
@@ -64,25 +100,43 @@ class FunWithDataExplorer {
     select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join("");
   }
 
+  updateSubtopics() {
+    const topic = document.getElementById("topic-select").value;
+    const subtopics = [...new Set(this.data.filter(d => d.topic === topic).map(d => d.subtopic))];
+    this.populateDropdown("subtopic-select", subtopics);
+  }
+
   updateIndicators() {
     const topic = document.getElementById("topic-select").value;
+    const subtopic = document.getElementById("subtopic-select").value;
     const indicators = [...new Set(
-      this.data.filter(d => d.topic === topic).map(d => d.indicator)
+      this.data.filter(d => d.topic === topic && d.subtopic === subtopic)
+               .map(d => `${d.indicator_id}||${d.indicator}`)
     )];
-    this.populateDropdown("indicator-select", indicators);
+
+    // Store both id and name in value
+    const select = document.getElementById("indicator-select");
+    select.innerHTML = indicators.map(v => {
+      const [id, name] = v.split("||");
+      return `<option value="${id}">${name}</option>`;
+    }).join("");
   }
 
   filterData() {
     const topic = document.getElementById("topic-select").value;
-    const indicator = document.getElementById("indicator-select").value;
+    const subtopic = document.getElementById("subtopic-select").value;
+    const indicator_id = document.getElementById("indicator-select").value;
     const geo = document.getElementById("geo-select").value;
     const year = document.getElementById("year-select").value;
+    const freq = document.getElementById("frequency-select").value;
 
     return this.data.filter(d =>
       d.topic === topic &&
-      d.indicator === indicator &&
+      d.subtopic === subtopic &&
+      d.indicator_id === indicator_id &&
       d.geography === geo &&
-      (year === "All" || d.year == year)
+      (year === "All" || d.year == year) &&
+      (freq === "" || d.frequency === freq)
     );
   }
 
@@ -90,41 +144,39 @@ class FunWithDataExplorer {
     const filtered = this.filterData();
     this.renderChart(filtered);
     this.renderTable(filtered);
+    this.renderMetadata(filtered[0]);
   }
 
   renderChart(data) {
     const ctx = document.getElementById("fwd-chart");
-
-    if (this.chart) {
-      this.chart.destroy();
-    }
+    if (this.chart) this.chart.destroy();
 
     this.chart = new Chart(ctx, {
       type: "line",
       data: {
-        labels: data.map(d => d.year),
+        labels: data.map(d => d.period || d.year),
         datasets: [{
           label: data[0]?.indicator || "",
-          data: data.map(d => d.value)
+          data: data.map(d => d.value),
+          borderColor: "rgba(75, 192, 192, 1)",
+          fill: false,
+          tension: 0.1
         }]
       },
       options: {
         responsive: true,
-        plugins: {
-          legend: { display: true }
-        }
+        plugins: { legend: { display: true } }
       }
     });
   }
 
   renderTable(data) {
     const container = document.getElementById("fwd-table-container");
-
     container.innerHTML = `
       <table id="fwd-table">
         <thead>
           <tr>
-            <th>Year</th>
+            <th>Period/Year</th>
             <th>Value</th>
             <th>Unit</th>
           </tr>
@@ -132,7 +184,7 @@ class FunWithDataExplorer {
         <tbody>
           ${data.map(d => `
             <tr>
-              <td>${d.year}</td>
+              <td>${d.period || d.year}</td>
               <td>${d.value}</td>
               <td>${d.unit}</td>
             </tr>
@@ -142,36 +194,64 @@ class FunWithDataExplorer {
     `;
   }
 
+  renderMetadata(d) {
+    const container = document.getElementById("fwd-metadata-container");
+    if (!d) {
+      container.innerHTML = "<p>No metadata available</p>";
+      return;
+    }
+
+    container.innerHTML = `
+      <h3>${d.indicator}</h3>
+      <p><strong>Definition:</strong> ${d.definition}</p>
+      <p><strong>Calculation Method:</strong> ${d.calculation_method}</p>
+      <p><strong>Source:</strong> <a href="${d.source_url}" target="_blank">${d.source_name}</a></p>
+      <p><strong>Dataset:</strong> <a href="${d.dataset_url}" target="_blank">${d.dataset_name}</a></p>
+      <p><strong>Frequency:</strong> ${d.frequency}</p>
+      <p><strong>Last Updated:</strong> ${d.last_updated}</p>
+      <p><strong>Notes:</strong> ${d.notes}</p>
+    `;
+  }
+
   showChart() {
     document.getElementById("fwd-chart").style.display = "block";
     document.getElementById("fwd-table-container").style.display = "none";
+    document.getElementById("fwd-metadata-container").style.display = "none";
   }
 
   showTable() {
     document.getElementById("fwd-chart").style.display = "none";
     document.getElementById("fwd-table-container").style.display = "block";
+    document.getElementById("fwd-metadata-container").style.display = "none";
+  }
+
+  showMetadata() {
+    document.getElementById("fwd-chart").style.display = "none";
+    document.getElementById("fwd-table-container").style.display = "none";
+    document.getElementById("fwd-metadata-container").style.display = "block";
   }
 
   downloadCSV() {
     const data = this.filterData();
+    const headers = Object.keys(data[0] || {});
     const csv = [
-      ["Year","Value","Unit"],
-      ...data.map(d => [d.year, d.value, d.unit])
-    ].map(e => e.join(",")).join("\n");
+      headers.join(","),
+      ...data.map(row => headers.map(h => row[h]).join(","))
+    ].join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "data.csv";
+    link.download = "filtered-data.csv";
     link.click();
   }
 }
 
+// Initialize
 document.addEventListener("DOMContentLoaded", () => {
   const explorer = new FunWithDataExplorer(
     "fwd-data-explorer",
-    "https://danghenry.github.io/data-explorer/sample_app_data.json"
+    "https://YOURUSERNAME.github.io/fwd-data-explorer/data/canada-master-template.csv"
   );
   explorer.init();
-
 });
