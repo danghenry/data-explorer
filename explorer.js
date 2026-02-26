@@ -23,13 +23,9 @@ class FunWithDataExplorer {
     Papa.parse(this.dataUrl, {
       download: true,
       header: true,
-      dynamicTyping: false, // safer for debugging
+      dynamicTyping: false,
       skipEmptyLines: true,
       complete: (results) => {
-
-        console.log("RAW RESULTS:", results);
-        console.log("Errors:", results.errors);
-        console.log("First row:", results.data[0]);
 
         if (!results.data || results.data.length === 0) {
           console.error("No rows returned from CSV.");
@@ -38,9 +34,22 @@ class FunWithDataExplorer {
           return;
         }
 
-        this.data = results.data;
+        // Normalize headers: lowercase + trim + replace spaces with underscores
+        this.data = results.data.map(row => {
+          const normalized = {};
+          Object.keys(row).forEach(key => {
+            const newKey = key
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "_");
+            normalized[newKey] = row[key];
+          });
+          return normalized;
+        });
 
-        console.log("Total rows loaded:", this.data.length);
+        console.log("CSV loaded. Total rows:", this.data.length);
+        console.log("Detected columns:", Object.keys(this.data[0]));
+        console.log("Sample row:", this.data[0]);
 
         resolve();
       },
@@ -51,8 +60,7 @@ class FunWithDataExplorer {
     });
   });
 }
-        // Filter valid rows safely
-        this.data = this.data.filter(row => row.topic && row.indicator_id);
+       
 
         console.log("CSV loaded. Rows:", this.data.length);
         console.log("Sample row:", this.data[0]);
@@ -271,6 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   explorer.init();
 });
+
 
 
 
