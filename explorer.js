@@ -23,23 +23,34 @@ class FunWithDataExplorer {
     Papa.parse(this.dataUrl, {
       download: true,
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false, // safer for debugging
       skipEmptyLines: true,
       complete: (results) => {
 
-        // Normalize headers (lowercase + underscores)
-        this.data = results.data.map(row => {
-          const normalizedRow = {};
-          Object.keys(row).forEach(key => {
-            const normalizedKey = key
-              .toLowerCase()
-              .trim()
-              .replace(/\s+/g, "_");
-            normalizedRow[normalizedKey] = row[key];
-          });
-          return normalizedRow;
-        });
+        console.log("RAW RESULTS:", results);
+        console.log("Errors:", results.errors);
+        console.log("First row:", results.data[0]);
 
+        if (!results.data || results.data.length === 0) {
+          console.error("No rows returned from CSV.");
+          this.data = [];
+          resolve();
+          return;
+        }
+
+        this.data = results.data;
+
+        console.log("Total rows loaded:", this.data.length);
+
+        resolve();
+      },
+      error: (err) => {
+        console.error("CSV Load Error:", err);
+        reject(err);
+      }
+    });
+  });
+}
         // Filter valid rows safely
         this.data = this.data.filter(row => row.topic && row.indicator_id);
 
@@ -260,5 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   explorer.init();
 });
+
 
 
