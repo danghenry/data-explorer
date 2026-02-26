@@ -126,10 +126,11 @@ class FunWithDataExplorer {
     this.updateIndicators();
   }
 
-  populateDropdown(id, values) {
-    const select = document.getElementById(id);
-    select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join("");
-  }
+ populateDropdown(id, values) {
+  const select = document.getElementById(id);
+  const sorted = values.filter(v => v !== undefined && v !== null).sort();
+  select.innerHTML = sorted.map(v => `<option value="${v}">${v}</option>`).join("");
+}
 
   updateSubtopics() {
     if (!this.hasSubtopic) return;
@@ -259,4 +260,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   explorer.init();
 });
+
 
